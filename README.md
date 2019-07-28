@@ -22,7 +22,7 @@
 ```bash
   $ cd ws
   $ source devel/setup.bash
-  $ roslaunch premaidai_ros_bridge display.launch serial_port:=/dev/frcomm0 servo_off_mode:=True
+  $ roslaunch premaidai_ros_bridge display.launch serial_port:=/dev/frcomm0 servo_off_mode:=true
 ```
 
 ## How to connect
