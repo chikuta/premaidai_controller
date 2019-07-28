@@ -9,8 +9,8 @@
 ```bash
   $ mkdir -p ws/src
   $ cd ws
-  $ catkin init .
-  $ wget https://raw.githubusercontent.com/chikuta/premaidai_ros_bridge/master/premaidai_ros_bridge.rosinstall
+  $ catkin init
+  $ wget https://raw.githubusercontent.com/chikuta/premaidai_ros_bridge/master/premaidai_ros_bridge.rosinstall .rosinstall
   $ rosinstall .
   $ catkin build
 ```

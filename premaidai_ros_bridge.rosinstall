@@ -1,2 +1,2 @@
-- git: {local-name: src/premaidai_description, url: https://github.com/chikuta/premaidai_description}
-- git: {local-name: src/premaidai_ros_bridge, url: https://github.com/chikuta/premaidai_ros_bridge}
+- git: {local-name: "src/premaidai_description", uri: "https://github.com/chikuta/premaidai_description"}
+- git: {local-name: "src/premaidai_ros_bridge", uri: "https://github.com/chikuta/premaidai_ros_bridge"}
