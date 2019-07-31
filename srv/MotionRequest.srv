@@ -1,0 +1,27 @@
+# プリメイドAIでサポートされているコマンド一覧
+uint8 DANCE = 1           # ダンス再生
+uint8 HOME = 61           # ホーム
+uint8 DOZO = 62           # どうぞ
+uint8 WAKUWAKU = 63       # ワクワク
+uint8 KOSHINITE = 64      # コシニテ
+uint8 YOUKOSO = 65        # ようこそ
+uint8 ONEGAI = 66         # おねがい
+uint8 BYEBYE = 67         # バイバイ
+uint8 RKISS = 68          # 右にキス
+uint8 LKISS = 69          # 左にキス
+uint8 GUN = 70            # ピストル
+uint8 KEIREI = 71         # 敬礼
+uint8 EN = 72             # え〜ん
+uint8 HART = 73           # ハート
+uint8 KIRA = 74           # キラッ
+uint8 ANATAHE = 75        # あなたへ
+uint8 MONKEY = 76         # もんきー
+uint8 GOGO = 77           # Gox2
+uint8 GUITER = 78         # エアギター
+uint8 RTURN = 79          # 右ターン
+uint8 LTURN = 80          # 左ターン
+
+uint8 motion_command      # MotionCommandを指定することで動作
+---
+
+bool result               # 実行結果

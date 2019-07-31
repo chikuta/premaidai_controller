@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(premaidai_ros_bridge)
 
-find_package(catkin REQUIRED)
+find_package(catkin REQUIRED COMPONENTS
+  std_msgs
+  sensor_msgs
+  geometry_msgs
+  trajectory_msgs
+  control_msgs
+  message_generation
+)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -16,25 +23,17 @@ catkin_python_setup()
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
-
-## Generate actions in the 'action' folder
-# add_action_files(
-#   FILES
-#   Action1.action
-#   Action2.action
-# )
+add_service_files(
+  FILES
+  MotionRequest.srv
+)
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-#   sensor_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+  sensor_msgs
+)
 
 
 ###################################
