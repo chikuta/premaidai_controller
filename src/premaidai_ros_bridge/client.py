@@ -118,7 +118,7 @@ class MotionCommand(CommandBase):
 
         # check command type
         if self._response.command != self.get_command_type():
-            msg = "Invalid command id. excpected={} actual={}".format(self._generate_command(), self._response.command)
+            msg = "Invalid command id. excpected={} actual={}".format(self._response.command, self.get_command_type())
             raise ValueError(msg)
 
         # check error
@@ -261,7 +261,7 @@ class ServoOffCommand(CommandBase):
 class ServoControlCommand(CommandBase):
     u""" サーボを直接制御するためのコマンド
     """
-    Request = namedtuple("Request", ["id", "speed", "position"])
+    Request = namedtuple("Request", ["id", "position"])
 
     # レスポンスデータを保存するために使用
     Response = namedtuple("Response", ["command", "param", "checkbyte"])
@@ -271,16 +271,18 @@ class ServoControlCommand(CommandBase):
     _RES_EXECUTE_LENGTH_FAILURE = 0x08      # LENより短いご送信
     _RES_EXECUTE_OPTION_FAILURE = 0x10      # Option値異常
 
-    def __init__(self, requests):
+    def __init__(self, speed, requests):
         super(ServoControlCommand, self).__init__(self.CMD_SET_SERVO_POS)
+        self._speed = speed
         self._requests = requests
 
     def generate_command(self):
-        send_command = [self.CMD_SET_SERVO_POS, 0x00, 0x80]
+        send_command = [self.CMD_SET_SERVO_POS, 0x00, self._speed]
 
         # すべて脱力状態 target_pos = 0 のコマンドを作成する
         for request in self._requests:
-            send_command.extend([request.id, request.speed, request.position])
+            send_command.append(request.id)
+            send_command.extend([request.position & 0xFF, (request.position >> 0x08) & 0xFF])
         send_command = self._generate_command(send_command)
         return self._generate_binary_command(send_command)
 
@@ -315,7 +317,6 @@ class ServoControlCommand(CommandBase):
             logger.error(msg)
             raise RuntimeError(msg)
 
-
 class Connector(threading.Thread):
     u""" プリメイドAIとコマンドのやり取りをするクラス
     """
@@ -323,7 +324,6 @@ class Connector(threading.Thread):
 
     def __init__(self, com, baudrate, timeout=None):
         super(Connector, self).__init__()
-        self._receive_queue = Queue()
         self._send_queue = Queue()
         self._is_shutdown = False
         self._sequence_id = 0
@@ -338,27 +338,30 @@ class Connector(threading.Thread):
             try:
                 self._run()
             except Exception as err:
-                pass
+                logger.warn(str(err))
 
     def _run(self):
         while not self._send_queue.empty():
-            # send data
-            request = self._send_queue.get()
-            send_data = request.command.generate_command()
-            self._serial.write(send_data)
+            try:
+                # send data
+                request = self._send_queue.get()
+                send_data = request.command.generate_command()
+                self._serial.write(send_data)
 
-            # receive data
-            recv_data_len = struct.unpack("B", self._serial.read(1))[0] - 1
-            recv_binary_data = self._serial.read(recv_data_len)
+                # receive data
+                recv_data_len = struct.unpack("B", self._serial.read(1))[0] - 1
+                recv_binary_data = self._serial.read(recv_data_len)
 
-            # put data to receive queue
-            request.command.process_response(recv_binary_data)
+                # put data to receive queue
+                request.command.process_response(recv_binary_data)
+
+            except Exception as err:
+                msg = "exception occured. msg = {}".format(err)
+                logger.warn(msg)
 
             # call callback
             if request.callback:
                 request.callback(request.command)
-            else:
-                self._receive_queue.put(request.command)
 
             # call event
             request.event.set()
@@ -368,9 +371,6 @@ class Connector(threading.Thread):
         event = threading.Event()
         self._send_queue.put(self.Request(self._sequence_id, command, event, callback))
         return event
-
-    def get_response(self):
-        return self._receive_queue.get()
 
 
 class Controller(object):
@@ -388,12 +388,16 @@ class Controller(object):
         self._connector = Connector(serial_port, 115200)
 
         # load config data for joint
-        self._joint_config_dict = {}
+        self._joint_name_config_dict = {}
+        self._joint_id_config_dict = {}
+        self._joint_names = []
         with open(config_file) as f:
             joint_configs = yaml.load(f)
             for config in joint_configs['joint_configs']:
                 joint_config = Controller.JointConfig(**config)
-                self._joint_config_dict[joint_config.id] = joint_config
+                self._joint_id_config_dict[joint_config.id] = joint_config
+                self._joint_name_config_dict[joint_config.name] = joint_config
+                self._joint_names.append(joint_config.name)
 
     def start(self):
         self._connector.start()
@@ -405,8 +409,13 @@ class Controller(object):
         angle = float(encoder_pos - self._ENCODER_MIN) / (self._ENCODER_MAX - self._ENCODER_MIN) * 270.0 - 135.0
         return (angle + config.offset) / 180.0 * math.pi * config.direction
 
-    def _angle_to_encoder(self, joint_id, angle):
-        pass
+    def _angle_to_encoder(self, config, angle):
+        rate = (angle * 180.0 / math.pi * config.direction + 135.0) / 270.0
+        enc_position = int(math.floor(rate * (self._ENCODER_MAX - self._ENCODER_MIN) + self._ENCODER_MIN))
+        return enc_position
+
+    def _speed_to_servo_speed(self, config, speed):
+        return 0x80
 
     def power_off(self):
         cmd = ServoOffCommand()
@@ -429,17 +438,33 @@ class Controller(object):
         # convert encoder value to joint angle
         ret = {}
         for joint_status in joint_status_list:
-            if joint_status.id in self._joint_config_dict:
-                config = self._joint_config_dict[joint_status.id]
+            if joint_status.id in self._joint_id_config_dict:
+                config = self._joint_id_config_dict[joint_status.id]
                 name = config.name
                 ret[name] = self._encoder_to_joint_angle(config, joint_status.actual_position)
-
         return ret
 
     def set_joint_positions(self, joint_commands):
-        pass
+        requests = []
+        for joint_name, position in joint_commands.items():
+            if joint_name in self._joint_name_config_dict:
+                # get config data from dict
+                config = self._joint_name_config_dict[joint_name]
+                enc_pos = self._angle_to_encoder(config, position)
+                enc_speed = self._speed_to_servo_speed(config, 0x00)
+                request = ServoControlCommand.Request(config.id, enc_pos)
+                requests.append(request)
+
+        # send command and get response
+        cmd = ServoControlCommand(0x80, requests)
+        event = self._connector.send_command(cmd)
+        event.wait()
 
     def execute_motion(self, motion_id):
         cmd = MotionCommand(motion_id)
         event = self._connector.send_command(cmd)
         event.wait()
+        return True
+
+    def get_joint_names(self):
+        return self._joint_names
