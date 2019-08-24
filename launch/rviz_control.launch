@@ -12,12 +12,15 @@
     <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="bridge_node.py" output="screen">
         <param name="serial_port" value="$(arg serial_port)" />
         <param name="servo_off_mode" value="$(arg servo_off_mode)" />
+        <param name="publish_joint_state" value="false" />
         <param name="config_file" value="$(find premaidai_ros_bridge)/config/joint_config.yaml" />
         <remap from="joint_command" to="joint_states" />
     </node>
 
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
-    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <param name="rate" value="5" />
+    </node>
 
     <!-- load displays -->
     <param name="use_gui" value="$(arg gui)"/>
