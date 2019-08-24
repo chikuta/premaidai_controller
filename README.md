@@ -17,12 +17,22 @@
 
 ## How to launch
 
+### サーボをOFFにしてPremaidAIの状態表示
+
 プリメイドAIの電源を入れて以下のコマンドを実行します。
 
 ```bash
   $ cd ws
   $ source devel/setup.bash
   $ roslaunch premaidai_ros_bridge display.launch serial_port:=/dev/frcomm0 servo_off_mode:=true
+```
+
+### rvizでPremaidAIを操作
+
+```bash
+  $ cd ws
+  $ source devel/setup.bash
+  $ roslaunch premaidai_ros_bridge rviz_control.launch serial_port:=/dev/frcomm0
 ```
 
 ## How to connect
