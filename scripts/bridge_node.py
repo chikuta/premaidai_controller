@@ -30,7 +30,21 @@ class RosBridgeNode(object):
         # launch controller
         port_name = rospy.get_param("~serial_port", "/dev/rfcomm0")
         file_name = rospy.get_param("~config_file", "NONE")
-        self._controller = Controller('/dev/rfcomm0', file_name)
+        publish_joint_state = rospy.get_param("~publish_joint_state", "NONE")
+        self._controller = Controller('/dev/rfcomm0', 1, file_name, self._joint_state_callback, publish_joint_state)
+
+        # get param
+        self._publish_joint_states = rospy.get_param("~publish_joint_states", True)
+
+    def _joint_state_callback(self, joint_angle_dict):
+        joint_state = JointState()
+        joint_state.header.stamp = rospy.Time.now()
+        for name, angle in joint_angle_dict.items():
+            joint_state.name.append(name)
+            joint_state.position.append(angle)
+
+        if self._publish_joint_states:
+            self._joint_pub.publish(joint_state)
 
     def _motion_request(self, request):
         result = self._controller.execute_motion(request.motion_command)
@@ -64,18 +78,11 @@ class RosBridgeNode(object):
 
         try:
             while not rospy.is_shutdown():
-                # send joint_state
-                joint_state = JointState()
-                joint_state.header.stamp = rospy.Time.now()
-                joint_angle_dict = self._controller.get_joint_status()
-                for name, angle in joint_angle_dict.items():
-                    joint_state.name.append(name)
-                    joint_state.position.append(angle)
-
-                self._joint_pub.publish(joint_state)
+                rate.sleep()
 
         except KeyboardInterrupt:
             pass
+
         except Exception as err:
             rospy.logerr("Exception occured. err = {}".format(err))
 
