@@ -35,6 +35,8 @@
   $ roslaunch premaidai_ros_bridge rviz_control.launch serial_port:=/dev/frcomm0
 ```
 
+<img src="https://raw.githubusercontent.com/wiki/chikuta/premaidai_ros_bridge/images/rviz_control.gif" width=50%>
+
 ## How to connect
 
 プリメイドAIの電源をつけたあとに以下のコマンドでBD Adressを取得します。
@@ -88,11 +90,6 @@ rfcomm0 {
 ```
 
 この場合、 `/dev/rfcomm0` がプリメイドAIと接続がされたシリアルポートになります。
-
-## TODO
-- [ ] 各Joint用制御IF作成
-- [ ] JointStatePublisherの動作周期改善
-
 
 ## Refers
 * [楽しく遊ぶプリメイドAI 解析メモ](https://docs.google.com/spreadsheets/d/1c6jqMwkBroCuF74viU_q7dgSQGzacbUW4mJg-957_Rs/edit#gid=2102495394)
