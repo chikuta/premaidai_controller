@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(premaidai_ros_bridge)
 
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
   std_msgs
   sensor_msgs
   geometry_msgs
@@ -10,17 +11,12 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
+find_package(Boost REQUIRED COMPONENTS thread)
+
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 catkin_python_setup()
-
-## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
 
 ## Generate services in the 'srv' folder
 add_service_files(
@@ -35,21 +31,40 @@ generate_messages(
   sensor_msgs
 )
 
+include_directories(
+  include
+  ${Boost_INCLUDE_DIRS}
+  ${catkin_INCLUDE_DIRS}
+)
+
+add_library(premaidai_ros_bridge
+  src/command.cc
+  src/serial_port.cc
+  src/ros_bridge.cc
+)
+
+target_link_libraries(premaidai_ros_bridge
+  ${Boost_LIBRARIES}
+  ${catkin_LIBRARIES}
+)
+
+add_executable(premaidai_ros_bridge_node
+  src/ros_bridge_node.cc
+)
+
+target_link_libraries(premaidai_ros_bridge_node
+  premaidai_ros_bridge
+  ${catkin_LIBRARIES}
+)
 
 ###################################
 ## catkin specific configuration ##
 ###################################
-## The catkin_package macro generates cmake config files for your package
-## Declare things to be passed to dependent projects
-## INCLUDE_DIRS: uncomment this if your package contains header files
-## LIBRARIES: libraries you create in this project that dependent projects also need
-## CATKIN_DEPENDS: catkin_packages dependent projects also need
-## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES premaidai_bridge
-#  CATKIN_DEPENDS other_catkin_pkg
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  # LIBRARIES premaidai_bridge
+  # CATKIN_DEPENDS other_catkin_pkg
+  # DEPENDS system_lib
 )
 
 #############
@@ -67,16 +82,3 @@ install(DIRECTORY
   config
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_premaidai_bridge.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
-
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
