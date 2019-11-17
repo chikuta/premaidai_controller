@@ -4,25 +4,39 @@
     <arg name="gui" default="true" />
     <arg name="robot" default="premaidai" />
     <arg name="serial_port" default="/dev/rfcomm0" />
-    <arg name="servo_off_mode" default="false" />
 
     <!-- load robot -->
     <param name="robot_description" command="$(find xacro)/xacro.py '$(find premaidai_description)/robots/$(arg robot).urdf.xacro'" />
 
-    <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="bridge_node.py" output="screen">
+    <!-- <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="bridge_node.py" output="screen"> -->
+    <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="premaidai_ros_bridge_node" output="screen">
         <param name="serial_port" value="$(arg serial_port)" />
-        <param name="servo_off_mode" value="$(arg servo_off_mode)" />
         <param name="publish_joint_state" value="false" />
-        <param name="config_file" value="$(find premaidai_ros_bridge)/config/joint_config.yaml" />
-        <remap from="joint_command" to="joint_states" />
+        <rosparam command="load" file="$(find premaidai_ros_bridge)/config/joint_config.yaml" />
+        <remap from="~joint_states" to="/actual/joint_states"/>
+        <remap from="~joint_command" to="/command/joint_states"/>
     </node>
 
-    <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher" />
+    <!-- robot_state_publisher -->
+    <node name="cmd_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="tf_prefix" value="command"/>
+        <remap from="joint_states" to="/command/joint_states"/>
+    </node>
+    <node name="act_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <param name="tf_prefix" value="actual"/>
+        <remap from="joint_states" to="/actual/joint_states"/>
+    </node>
+
+    <!-- tf broadcaster -->
+    <node pkg="tf" type="static_transform_publisher" name="world_to_cmd_broadcaster" args="1 0 0 0 0 0 world command/base_link 100" />
+    <node pkg="tf" type="static_transform_publisher" name="world_to_act_broadcaster" args="1 0 0 0 0 0 world actual/base_link 100" />
+
+    <param name="use_gui" value="$(arg gui)"/>
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-        <param name="rate" value="5" />
+        <param name="rate" value="10"/>
+        <remap from="joint_states" to="/command/joint_states"/>
     </node>
 
     <!-- load displays -->
-    <param name="use_gui" value="$(arg gui)"/>
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find premaidai_description)/launch/display.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find premaidai_ros_bridge)/launch/display.rviz"/>
 </launch>
