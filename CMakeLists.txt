@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(premaidai_ros_bridge)
+add_definitions(-std=c++11)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -8,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   trajectory_msgs
   control_msgs
+  controller_manager
   message_generation
 )
 
@@ -41,6 +43,7 @@ add_library(premaidai_ros_bridge
   src/command.cc
   src/serial_port.cc
   src/ros_bridge.cc
+  src/robot.cc
 )
 
 target_link_libraries(premaidai_ros_bridge
@@ -53,6 +56,15 @@ add_executable(premaidai_ros_bridge_node
 )
 
 target_link_libraries(premaidai_ros_bridge_node
+  premaidai_ros_bridge
+  ${catkin_LIBRARIES}
+)
+
+add_executable(premaidai_driver_node
+  src/ros_hw_interface_node.cc
+)
+
+target_link_libraries(premaidai_driver_node
   premaidai_ros_bridge
   ${catkin_LIBRARIES}
 )
