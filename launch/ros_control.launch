@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<launch>
+    <!-- args -->
+    <arg name="gui" default="true" />
+    <arg name="robot" default="premaidai" />
+    <arg name="serial_port" default="/dev/rfcomm0" />
+    <arg name="servo_off_mode" default="false" />
+
+    <arg name="pipeline" default="ompl" />
+    <arg name="db" default="false" />
+    <arg name="db_path" default="$(find premaidai_moveit_config)/default_warehouse_mongo_db" />
+    <arg name="debug" default="false" />
+
+    <!-- load robot -->
+    <param name="robot_description" command="$(find xacro)/xacro.py '$(find premaidai_description)/robots/$(arg robot).urdf.xacro'" />
+
+    <!-- Load joint controller configurations from YAML file to parameter server -->
+    <group ns="premaidai_ros_bridge">
+        <rosparam file="$(find premaidai_ros_bridge)/config/controllers.yaml" command="load"/>
+        <rosparam file="$(find premaidai_moveit_config)/config/ros_controllers.yaml" command="load"/>
+    </group>
+
+    <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" ns="premaidai_ros_bridge" output="screen" args="joint_state_controller"/> -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="premaidai_ros_bridge"
+        args="joint_state_controller larm_controller rarm_controller head_controller rleg_controller lleg_controller"/>
+
+    <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="premaidai_driver_node" output="screen">
+        <rosparam file="$(find premaidai_moveit_config)/config/ros_controllers.yaml" command="load"/>
+        <rosparam command="load" file="$(find premaidai_ros_bridge)/config/joint_config.yaml"/>
+        <param name="serial_port" value="$(arg serial_port)"/>
+        <param name="servo_off_mode" value="$(arg servo_off_mode)"/>
+        <!-- <remap from="~joint_states" to="/joint_states"/> -->
+        <!-- <remap from="~controller_manager" to="/controller_manager"/> -->
+    </node>
+
+    <!-- robot_state_publisher -->
+    <node name="act_robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+        <!-- <param name="tf_prefix" value="actual"/> -->
+        <!-- <remap from="joint_states" to="actual/joint_states"/> -->
+    </node>
+
+    <group ns="premaidai_ros_bridge">
+    <!-- Run the main MoveIt! executable without trajectory execution (we do not have controllers configured by default) -->
+    <include file="$(find premaidai_moveit_config)/launch/move_group.launch">
+        <arg name="allow_trajectory_execution" value="true"/>
+        <arg name="fake_execution" value="false"/>
+        <arg name="info" value="true"/>
+        <arg name="debug" value="$(arg debug)"/>
+        <arg name="pipeline" value="$(arg pipeline)"/>
+    </include>
+
+    <!-- Run Rviz and load the default config to see the state of the move_group node -->
+    <include file="$(find premaidai_moveit_config)/launch/moveit_rviz.launch">
+        <arg name="rviz_config" value="$(find premaidai_moveit_config)/launch/moveit.rviz"/>
+        <arg name="debug" value="$(arg debug)"/>
+    </include>
+
+    <!-- If database loading was enabled, start mongodb as well -->
+    <include file="$(find premaidai_moveit_config)/launch/default_warehouse_db.launch" if="$(arg db)">
+        <arg name="moveit_warehouse_database_path" value="$(arg db_path)"/>
+    </include>
+    </group>
+</launch>

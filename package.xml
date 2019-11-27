@@ -10,9 +10,13 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <depend>ros_control</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>control_msgs</depend>
   <exec_depend>pyserial</exec_depend>
-  <exec_depend>std_msgs</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
 
   <export>
   </export>
