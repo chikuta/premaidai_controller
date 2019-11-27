@@ -1,0 +1,44 @@
+larm_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - l_shy_joint
+    - l_shx_joint
+    - l_ely_joint
+    - l_elx_joint
+    - l_wry_joint
+
+rarm_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - r_shy_joint
+    - r_shx_joint
+    - r_ely_joint
+    - r_elx_joint
+    - r_wry_joint
+
+head_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - head_ny_joint
+    - head_nz_joint
+    - head_nx_joint
+
+rleg_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - r_hpz_joint
+    - r_hpx_joint
+    - r_hpy_joint
+    - r_kny_joint
+    - r_aky_joint
+    - r_akx_joint
+
+lleg_controller:
+  type: position_controllers/JointTrajectoryController
+  joints:
+    - l_hpz_joint
+    - l_hpx_joint
+    - l_hpy_joint
+    - l_kny_joint
+    - l_aky_joint
+    - l_akx_joint
