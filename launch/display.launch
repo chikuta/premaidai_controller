@@ -8,10 +8,10 @@
     <!-- load robot -->
     <param name="robot_description" command="$(find xacro)/xacro.py '$(find premaidai_description)/robots/$(arg robot).urdf.xacro'" />
 
-    <node name="premaidai_ros_bridge_node" pkg="premaidai_ros_bridge" type="premaidai_ros_bridge_node" output="screen">
+    <node name="premaidai_controller_node" pkg="premaidai_controller" type="premaidai_controller_node" output="screen">
         <param name="serial_port" value="$(arg serial_port)" />
         <param name="servo_off_mode" value="$(arg servo_off_mode)" />
-        <rosparam command="load" file="$(find premaidai_ros_bridge)/config/joint_config.yaml" />
+        <rosparam command="load" file="$(find premaidai_controller)/config/joint_config.yaml" />
         <remap from="~joint_states" to="/joint_states"/>
     </node>
 

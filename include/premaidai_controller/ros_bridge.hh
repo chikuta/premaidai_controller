@@ -1,17 +1,17 @@
-#ifndef PREMAIDAI_ROS_BRIDGE
-#define PREMAIDAI_ROS_BRIDGE
+#ifndef PREMAIDAI_CONTROLLER_HH
+#define PREMAIDAI_CONTROLLER_HH
 
 #include <memory>
 #include <ros/ros.h>
 #include <std_srvs/Trigger.h>
 #include <boost/thread.hpp>
 #include <sensor_msgs/JointState.h>
-#include "premaidai_ros_bridge/command.hh"
-#include "premaidai_ros_bridge/common.hh"
-#include "premaidai_ros_bridge/serial_port.hh"
-#include "premaidai_ros_bridge/MotionRequest.h"
+#include "premaidai_controller/command.hh"
+#include "premaidai_controller/common.hh"
+#include "premaidai_controller/serial_port.hh"
+#include "premaidai_controller/MotionRequest.h"
 
-namespace premaidai_ros_bridge
+namespace premaidai_controller
 {
     class ROSBridge
     {
@@ -70,4 +70,4 @@ namespace premaidai_ros_bridge
     };
 };
 
-#endif // PREMAIDAI_ROS_BRIDGE
+#endif // PREMAIDAI_CONTROLLER_HH

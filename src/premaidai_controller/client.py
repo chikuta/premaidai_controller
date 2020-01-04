@@ -352,7 +352,6 @@ class Sender(threading.Thread):
             send_data = request.command.generate_command()
             self._serial.write(send_data)
             self._connection_queue.put(request)
-            time.sleep(0.1)
 
 
 class Receiver(threading.Thread):
@@ -510,27 +509,44 @@ class Controller(threading.Thread):
             cmds = [ServoStatusCommand(1, 16), ServoStatusCommand(17, 17)]
 
             # 送信した分のイベントを保存
-            [self._connector.send_command(cmd, self._servo_status_callback) for cmd in cmds]
+            events = [self._connector.send_command(cmd, self._servo_status_callback) for cmd in cmds]
+            [event.wait() for event in events]
 
-            # データを受信していた場合はまとめて送信
-            while self._servo_status_callback_queue.qsize() > 1:
-                cmds = [self._servo_status_callback_queue.get(), self._servo_status_callback_queue.get()]
+            # gather response
+            # TODO サーボIDをの判別が必要
+            joint_status_list = []
+            [joint_status_list.extend(cmd.get_response()) for cmd in cmds]
 
-                # gather response
-                # TODO サーボIDをの判別が必要
-                joint_status_list = []
-                [joint_status_list.extend(cmd.get_response()) for cmd in cmds]
+            # convert encoder value to joint angle
+            ret = {}
+            for joint_status in joint_status_list:
+                if joint_status.id in self._joint_id_config_dict:
+                    config = self._joint_id_config_dict[joint_status.id]
+                    name = config.name
+                    ret[name] = self._encoder_to_joint_angle(config, joint_status.actual_position)
 
-                # convert encoder value to joint angle
-                ret = {}
-                for joint_status in joint_status_list:
-                    if joint_status.id in self._joint_id_config_dict:
-                        config = self._joint_id_config_dict[joint_status.id]
-                        name = config.name
-                        ret[name] = self._encoder_to_joint_angle(config, joint_status.actual_position)
+            # call joint status calback
+            self._joint_state_callback(ret)
 
-                # call joint status calback
-                self._joint_state_callback(ret)
+            # # データを受信していた場合はまとめて送信
+            # while self._servo_status_callback_queue.qsize() > 1:
+            #     cmds = [self._servo_status_callback_queue.get(), self._servo_status_callback_queue.get()]
+
+            #     # gather response
+            #     # TODO サーボIDをの判別が必要
+            #     joint_status_list = []
+            #     [joint_status_list.extend(cmd.get_response()) for cmd in cmds]
+
+            #     # convert encoder value to joint angle
+            #     ret = {}
+            #     for joint_status in joint_status_list:
+            #         if joint_status.id in self._joint_id_config_dict:
+            #             config = self._joint_id_config_dict[joint_status.id]
+            #             name = config.name
+            #             ret[name] = self._encoder_to_joint_angle(config, joint_status.actual_position)
+
+            #     # call joint status calback
+            #     self._joint_state_callback(ret)
 
     def power_off(self):
         cmd = ServoOffCommand()
@@ -551,7 +567,7 @@ class Controller(threading.Thread):
         # send command and get response
         cmd = ServoControlCommand(0x80, requests)
         event = self._connector.send_command(cmd)
-        # event.wait()
+        event.wait()
 
     def execute_motion(self, motion_id):
         cmd = MotionCommand(motion_id)

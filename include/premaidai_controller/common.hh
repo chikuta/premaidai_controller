@@ -5,7 +5,7 @@
 #include <map>
 #include <vector>
 
-namespace premaidai_ros_bridge
+namespace premaidai_controller
 {
     typedef std::vector<double> DoubleArray;
     typedef std::vector<std::string> StringArray;

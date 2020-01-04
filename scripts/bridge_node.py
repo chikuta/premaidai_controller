@@ -7,8 +7,8 @@ import time
 from Queue import Queue
 
 # import local package
-from premaidai_ros_bridge.client import Controller
-from premaidai_ros_bridge.srv import MotionRequest
+from premaidai_controller.client import Controller
+from premaidai_controller.srv import MotionRequest
 
 # import ros related packages
 import rospy
