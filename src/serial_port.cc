@@ -1,9 +1,9 @@
-#include "premaidai_ros_bridge/serial_port.hh"
+#include "premaidai_controller/serial_port.hh"
 
 #include <boost/bind.hpp>
 #include <ros/ros.h>
 
-using namespace premaidai_ros_bridge;
+using namespace premaidai_controller;
 using namespace boost::asio;
 
 SerialPort::SerialPort(

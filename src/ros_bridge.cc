@@ -1,6 +1,6 @@
-#include "premaidai_ros_bridge/ros_bridge.hh"
+#include "premaidai_controller/ros_bridge.hh"
 
-using namespace premaidai_ros_bridge;
+using namespace premaidai_controller;
 
 ROSBridge::ROSBridge()
     : nh_("~")

@@ -1,11 +1,11 @@
-#include "premaidai_ros_bridge/command.hh"
+#include "premaidai_controller/command.hh"
 
 #include <ros/ros.h>
 #include <sstream>
 #include <cmath>
 #include <boost/format.hpp>
 
-using namespace premaidai_ros_bridge;
+using namespace premaidai_controller;
 
 // explicit
 Command::Command(const CommandType& type)

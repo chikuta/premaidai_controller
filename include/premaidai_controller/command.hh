@@ -3,9 +3,9 @@
 
 #include <vector>
 #include <cstdint>
-#include "premaidai_ros_bridge/common.hh"
+#include "premaidai_controller/common.hh"
 
-namespace premaidai_ros_bridge
+namespace premaidai_controller
 {
     typedef std::vector<uint8_t> FrameData;
 
@@ -229,6 +229,6 @@ namespace premaidai_ros_bridge
         virtual ~ServoControlResponseCommand();
     };
 
-}; // end namespae premaidai_ros_bridge
+}; // end namespae premaidai_controller
 
 #endif // _PREMAIDAI_COMMAND_HH_

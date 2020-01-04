@@ -10,7 +10,7 @@
   $ mkdir -p ws/src
   $ cd ws
   $ catkin init
-  $ wget https://raw.githubusercontent.com/chikuta/premaidai_ros_bridge/master/premaidai_ros_bridge.rosinstall .rosinstall
+  $ wget https://raw.githubusercontent.com/chikuta/premaidai_controller/master/premaidai_controller.rosinstall .rosinstall
   $ rosinstall .
   $ catkin build
 ```
@@ -24,7 +24,7 @@
 ```bash
   $ cd ws
   $ source devel/setup.bash
-  $ roslaunch premaidai_ros_bridge display.launch serial_port:=/dev/frcomm0 servo_off_mode:=true
+  $ roslaunch premaidai_controller display.launch serial_port:=/dev/frcomm0 servo_off_mode:=true
 ```
 
 ### rvizでPremaidAIを操作
@@ -32,10 +32,10 @@
 ```bash
   $ cd ws
   $ source devel/setup.bash
-  $ roslaunch premaidai_ros_bridge rviz_control.launch serial_port:=/dev/frcomm0
+  $ roslaunch premaidai_controller rviz_control.launch serial_port:=/dev/frcomm0
 ```
 
-<img src="https://raw.githubusercontent.com/wiki/chikuta/premaidai_ros_bridge/images/rviz_control.gif" width=50%>
+<img src="https://raw.githubusercontent.com/wiki/chikuta/premaidai_controller/images/rviz_control.gif" width=50%>
 
 ## How to connect
 

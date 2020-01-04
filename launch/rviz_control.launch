@@ -8,11 +8,11 @@
     <!-- load robot -->
     <param name="robot_description" command="$(find xacro)/xacro.py '$(find premaidai_description)/robots/$(arg robot).urdf.xacro'" />
 
-    <!-- <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="bridge_node.py" output="screen"> -->
-    <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="premaidai_ros_bridge_node" output="screen">
+    <!-- <node name="premaidai_controller" pkg="premaidai_controller" type="bridge_node.py" output="screen"> -->
+    <node name="premaidai_controller" pkg="premaidai_controller" type="premaidai_controller_node" output="screen">
         <param name="serial_port" value="$(arg serial_port)" />
         <param name="publish_joint_state" value="false" />
-        <rosparam command="load" file="$(find premaidai_ros_bridge)/config/joint_config.yaml" />
+        <rosparam command="load" file="$(find premaidai_controller)/config/joint_config.yaml" />
         <remap from="~joint_states" to="/actual/joint_states"/>
         <remap from="~joint_command" to="/command/joint_states"/>
     </node>
@@ -38,5 +38,5 @@
     </node>
 
     <!-- load displays -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find premaidai_ros_bridge)/launch/display.rviz"/>
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find premaidai_controller)/launch/display.rviz"/>
 </launch>

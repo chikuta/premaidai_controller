@@ -9,7 +9,7 @@
 #include <boost/thread.hpp>
 
 
-namespace premaidai_ros_bridge
+namespace premaidai_controller
 {
     typedef std::vector<uint8_t> FrameType;
 
