@@ -71,15 +71,6 @@ target_link_libraries(premaidai_driver_node
   ${catkin_LIBRARIES}
 )
 
-add_executable(premaidai_driver_node
-  src/ros_hw_interface_node.cc
-)
-
-target_link_libraries(premaidai_driver_node
-  premaidai_ros_bridge
-  ${catkin_LIBRARIES}
-)
-
 ###################################
 ## catkin specific configuration ##
 ###################################

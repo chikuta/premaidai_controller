@@ -7,10 +7,10 @@
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/robot_hw.h>
 
-#include "premaidai_ros_bridge/common.hh"
-#include "premaidai_ros_bridge/ros_bridge.hh"
+#include "premaidai_controller/common.hh"
+#include "premaidai_controller/ros_bridge.hh"
 
-namespace premaidai_ros_bridge
+namespace premaidai_controller
 {
 
     class RobotHW : public hardware_interface::RobotHW
