@@ -1,6 +1,6 @@
-#include <premaidai_ros_bridge/robot.hh>
+#include <premaidai_controller/robot.hh>
 
-using namespace premaidai_ros_bridge;
+using namespace premaidai_controller;
 
 
 RobotHW::RobotHW()

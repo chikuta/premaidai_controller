@@ -15,18 +15,18 @@
     <param name="robot_description" command="$(find xacro)/xacro.py '$(find premaidai_description)/robots/$(arg robot).urdf.xacro'" />
 
     <!-- Load joint controller configurations from YAML file to parameter server -->
-    <group ns="premaidai_ros_bridge">
-        <rosparam file="$(find premaidai_ros_bridge)/config/controllers.yaml" command="load"/>
+    <group ns="premaidai_controller">
+        <rosparam file="$(find premaidai_controller)/config/controllers.yaml" command="load"/>
         <rosparam file="$(find premaidai_moveit_config)/config/ros_controllers.yaml" command="load"/>
     </group>
 
-    <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" ns="premaidai_ros_bridge" output="screen" args="joint_state_controller"/> -->
-    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="premaidai_ros_bridge"
+    <!-- <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" ns="premaidai_controller" output="screen" args="joint_state_controller"/> -->
+    <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen" ns="premaidai_controller"
         args="joint_state_controller larm_controller rarm_controller head_controller rleg_controller lleg_controller"/>
 
-    <node name="premaidai_ros_bridge" pkg="premaidai_ros_bridge" type="premaidai_driver_node" output="screen">
+    <node name="premaidai_controller" pkg="premaidai_controller" type="premaidai_driver_node" output="screen">
         <rosparam file="$(find premaidai_moveit_config)/config/ros_controllers.yaml" command="load"/>
-        <rosparam command="load" file="$(find premaidai_ros_bridge)/config/joint_config.yaml"/>
+        <rosparam command="load" file="$(find premaidai_controller)/config/joint_config.yaml"/>
         <param name="serial_port" value="$(arg serial_port)"/>
         <param name="servo_off_mode" value="$(arg servo_off_mode)"/>
         <!-- <remap from="~joint_states" to="/joint_states"/> -->
@@ -39,7 +39,7 @@
         <!-- <remap from="joint_states" to="actual/joint_states"/> -->
     </node>
 
-    <group ns="premaidai_ros_bridge">
+    <group ns="premaidai_controller">
     <!-- Run the main MoveIt! executable without trajectory execution (we do not have controllers configured by default) -->
     <include file="$(find premaidai_moveit_config)/launch/move_group.launch">
         <arg name="allow_trajectory_execution" value="true"/>

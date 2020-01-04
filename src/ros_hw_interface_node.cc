@@ -1,8 +1,8 @@
-#include "premaidai_ros_bridge/robot.hh"
+#include "premaidai_controller/robot.hh"
 #include <ros/ros.h>
 #include <controller_manager/controller_manager.h>
 
-using namespace premaidai_ros_bridge;
+using namespace premaidai_controller;
 
 int
 main(int argc, char* argv[])
