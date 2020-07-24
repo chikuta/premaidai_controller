@@ -18,7 +18,7 @@
   <depend>control_msgs</depend>
 
   <build_depend>message_generation</build_depend>
-  <exec_depend>pyserial</exec_depend>
+  <exec_depend>python-serial</exec_depend>
   <export>
   </export>
 </package>
