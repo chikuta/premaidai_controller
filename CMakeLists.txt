@@ -56,6 +56,10 @@ add_executable(premaidai_controller_node
   src/ros_bridge_node.cc
 )
 
+add_dependencies(premaidai_controller_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+)
+
 target_link_libraries(premaidai_controller_node
   premaidai_controller
   ${catkin_LIBRARIES}
@@ -64,6 +68,10 @@ target_link_libraries(premaidai_controller_node
 add_executable(premaidai_driver_node
   src/robot.cc
   src/ros_hw_interface_node.cc
+)
+
+add_dependencies(premaidai_driver_node
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
 )
 
 target_link_libraries(premaidai_driver_node
